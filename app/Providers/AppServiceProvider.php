@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,5 +23,6 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         Model::unguard(); // Disable mass assignment protection globally pada semua model
+        Number::useCurrency('IDR'); // Set default currency to IDR (Indonesian Rupiah)
     }
 }
