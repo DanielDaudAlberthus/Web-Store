@@ -22,9 +22,25 @@ class  ProductCatalog extends Component
     public array $select_collections = [];
     public string $search = '';
     public string $sort_by = 'newest'; // Default sorting value
+
+    // handle errors in url
+    public function mount(){
+        $this->validate();
+    }
+        // Initialize the select_collections with an empty array
+
+    // handle errors
+    public function rules(){
+        return [
+            'select_collections' => 'array',
+            'select_collections.*' => 'integer|exists:tags,id',
+            'search' => 'nullable|string|min:3|max:50',
+            'sort_by' => 'in:newest,latest,price_asc,price_desc',
+        ];
+    }
     public function applyFilters()
     {
-        // Apply filters based on selected collections and search term
+        $this->validate();
         $this->resetPage(); // Reset pagination when filters are applied
     }
     public function resetFilters()
@@ -32,10 +48,18 @@ class  ProductCatalog extends Component
         $this->select_collections = [];
         $this->search = '';
         $this->sort_by = 'newest'; // Reset to default sorting
+        $this->resetErrorBag(); // Clear any validation errors
         $this->resetPage(); // Reset pagination when filters are reset
     }
     public function render()
     {
+        // early return if there are no collections selected
+        if ($this->getErrorBag()->isNotEmpty()) {
+            return view('livewire.product-catalog', [
+                'products' => ProductData::collect([]),
+                'collections' => ProductCollectionData::collect([]),
+            ]);
+        }
         // Mengambil data koleksi produk dengan jumlah produk yang terkait
         $collection_result = Tag::query()
             ->wheretype('collection')
@@ -57,10 +81,7 @@ class  ProductCatalog extends Component
         // Apply sorting based on the selected sort option
         switch ($this->sort_by) {
             case 'newest':
-                $query->orderBy('created_at', 'desc');
-                break;
-            case 'latest':
-                $query->orderBy('updated_at', 'desc');
+                $query->oldest();
                 break;
             case 'price_asc':
                 $query->orderBy('price', 'asc');
@@ -69,7 +90,8 @@ class  ProductCatalog extends Component
                 $query->orderBy('price', 'desc');
                 break;
             default:
-                $query->orderBy('created_at', 'desc'); // Default sorting
+                $query->latest(); // Default sorting
+                break;
         }
 
         // $result = Product::paginate((1)); // ORM / Eloquent untuk mengambil data produk
