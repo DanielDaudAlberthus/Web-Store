@@ -6,6 +6,7 @@ use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
 use App\Models\Product;
 use Filament\Forms;
+use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\SpatieTagsInput;
@@ -48,8 +49,9 @@ class ProductResource extends Resource
                     SpatieTagsInput::make('tags')
                         ->type('collection')
                         ->label('Collection'),
-                    TextInput::make('description')
-                        ->nullable(),
+                    MarkdownEditor::make('description')
+                        ->nullable()
+                        ->columnSpanFull(),
                     TextInput::make('stock')
                         ->numeric()
                         ->default(0),

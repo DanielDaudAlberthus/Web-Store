@@ -9,8 +9,6 @@ use App\Models\Product;
 use App\Models\Tag;
 use Livewire\Component;
 use Livewire\WithPagination;
-
-
 class  ProductCatalog extends Component
 {
     use WithPagination;

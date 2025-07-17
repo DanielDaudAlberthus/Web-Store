@@ -24,11 +24,13 @@ class ProductData extends Data
         public int $stock,
         public int $weight,
         public string $cover_url,
+        public Optional|array $gallery = new Optional(), // Menggunakan Optional untuk mengambil data galeri produk jika ada
+
     ) {
         $this->price_formatted = SupportNumber::currency($price);
     }
 
-    public static function fromModel(Product $product): self
+    public static function fromModel(Product $product, bool $with_gallery = false): self
     {
         return new self(
             $product->name,
@@ -40,6 +42,7 @@ class ProductData extends Data
             $product->stock,
             $product->weight,
             $product->getFirstMediaUrl('cover'), // Menggunakan metode getFirstMediaUrl untuk mendapatkan URL media pertama dari koleksi 'cover'
+            gallery: $with_gallery ? $product->getMedia('gallery')->map(fn ($media) => $media->getUrl())->toArray() : new Optional()
         );
     }
 
